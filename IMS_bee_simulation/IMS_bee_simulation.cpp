@@ -34,13 +34,29 @@ int createStartRowPosition();
 int createStartColPosition();
 void test();
 void newHive(int newRow, int newCol);
+int getSurroundValue(int row, int col);
+void initMap();
 
 int main()
 {
     getInitData();
+    initMap();
     test();
 }
 
+void initMap() {
+    for (int i = 0; i < MAX_ROW; i++) {
+        for (int j = 0; j < MAX_COL; j++) {
+            map[i][j] = 0;
+        }
+    }
+    int x = createStartRowPosition();
+    int y = createStartColPosition();
+    //TODO instead of 2 some value
+    map[x][y] = 2;
+
+    newHive(x, y);
+}
 
 void test() {
     newHive(1, 1);
@@ -52,6 +68,39 @@ void test() {
     std::advance(hive_front, 0);
 
     std::cout << hive_front->row << '\n';
+}
+
+int getSurroundValue(int row, int col) {
+    int value = 0;
+    int rowPlus = row + 1;
+    int rowMinus = row - 1;
+    int colPlus = col + 1;
+    int colMinus = col - 1;
+
+    if (rowPlus == MAX_ROW) {
+        rowPlus = 0;
+    }
+    if (colPlus == MAX_COL) {
+        colPlus = 0;
+    }
+    if (rowMinus == -1) {
+        rowMinus = MAX_ROW-1;
+    }
+    if (colMinus == -1) {
+        colMinus = MAX_COL-1;
+    }
+
+    //add surrounding values
+    value += map[rowPlus][col];
+    value += map[rowPlus][colPlus];
+    value += map[row][colPlus];
+    value += map[rowMinus][colPlus];
+    value += map[rowMinus][col];
+    value += map[rowMinus][colMinus];
+    value += map[row][colMinus];
+    value += map[rowPlus][colMinus];
+
+    return value;
 }
 
 Hive::Hive(int rowInit, int colInit) {
