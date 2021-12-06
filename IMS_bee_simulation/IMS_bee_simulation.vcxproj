@@ -141,6 +141,9 @@
   <ItemGroup>
     <ClCompile Include="IMS_bee_simulation.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="queen_eggs.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
