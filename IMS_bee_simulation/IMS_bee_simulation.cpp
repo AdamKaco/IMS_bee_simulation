@@ -6,6 +6,8 @@
 #include <string>
 #include <list>
 #include <algorithm>
+#include <chrono>
+#include <thread>
 
 using namespace std;
 
@@ -48,10 +50,12 @@ int main()
     initMap();
 
     for (int i = 0; i < 40; i++) {
-        cout << "month: " << i << "\n";
         copyPreviousData();
         applyRulesThroughWholeMap();
+        system("CLS");
+        cout << "month: " << i << "\n";
         printData();
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
     }
 }
 
@@ -105,10 +109,12 @@ int applyRules(int row, int col) {
         map[row][col] = prevMap[row][col]-1;
     }
     
+    //nicenie
     if (map[row][col] == 0) {
         ;
     }
 
+    //oddelovanie
     if (map[row][col] == 4) {
         map[row][col] = 2;
         
@@ -177,8 +183,6 @@ void initMap() {
     for (int i = 0; i < MAX_ROW; i++) {
         for (int j = 0; j < MAX_COL; j++) {
             map[i][j] = 0;
-            freeMapSpaces[i * MAX_ROW + j] = i * MAX_ROW + j;
-            
         }
     }
     int x = createStartRowPosition();
