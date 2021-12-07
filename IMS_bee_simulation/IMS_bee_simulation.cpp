@@ -43,6 +43,7 @@ void printData();
 void applyRulesThroughWholeMap();
 void setBeesThatWantFlower(int row, int col);
 void getAvailableFlowers(int row, int col);
+void hivePopulationChange(int row, int col);
 
 
 
