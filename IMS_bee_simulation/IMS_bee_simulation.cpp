@@ -21,6 +21,8 @@ struct Map
     int bees;
     float honey;
     int flowers;
+    int hiveFlowers;
+    int surrBees;
 };
 
 struct Map map[MAX_ROW][MAX_COL];
@@ -39,6 +41,8 @@ int applyRules(int row, int col);
 void copyPreviousData();
 void printData();
 void applyRulesThroughWholeMap();
+void setBeesThatWantFlower(int row, int col);
+void getAvailableFlowers(int row, int col);
 
 
 
@@ -61,7 +65,6 @@ int main()
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
     }
 }
-
 
 
 void applyRulesThroughWholeMap() {
@@ -99,21 +102,117 @@ void copyPreviousData() {
 }
 
 int applyRules(int row, int col) {
-    if (prevMap[row][col].hive == 0) {
-        return 0;
+    if (prevMap[row][col].flowers != 0) {
+        setBeesThatWantFlower(row, col);
     }
+    
+    if (prevMap[row][col].hive != 0) {
+        getAvailableFlowers(row, col);
+        hivePopulationChange(row, col);
+    }
+    
+
+    return 0;
+
+}
+void getAvailableFlowers(int row, int col) {
+
+    int rowPlus = row + 1;
+    int rowMinus = row - 1;
+    int colPlus = col + 1;
+    int colMinus = col - 1;
+    int value = 0;
+
+    if (rowPlus == MAX_ROW) {
+        rowPlus = 0;
+    }
+    if (colPlus == MAX_COL) {
+        colPlus = 0;
+    }
+    if (rowMinus == -1) {
+        rowMinus = MAX_ROW - 1;
+    }
+    if (colMinus == -1) {
+        colMinus = MAX_COL - 1;
+    }
+
+    if (prevMap[row][col].surrBees != 0) {
+        value += prevMap[row][col].flowers * prevMap[row][col].bees / prevMap[row][col].surrBees;
+    }
+    if (prevMap[rowPlus][col].surrBees != 0) {
+        value += prevMap[rowPlus][col].flowers * prevMap[rowPlus][col].bees / prevMap[rowPlus][col].surrBees;
+    }
+    if (prevMap[rowPlus][colPlus].surrBees != 0) {
+        value += prevMap[rowPlus][colPlus].flowers * prevMap[rowPlus][colPlus].bees / prevMap[rowPlus][colPlus].surrBees;
+    }
+    if (prevMap[row][colPlus].surrBees != 0) {
+        value += prevMap[row][colPlus].flowers * prevMap[row][colPlus].bees / prevMap[row][colPlus].surrBees;
+    }
+    if (prevMap[rowMinus][colPlus].surrBees != 0) {
+        value += prevMap[rowMinus][colPlus].flowers * prevMap[rowMinus][colPlus].bees / prevMap[rowMinus][colPlus].surrBees;
+    }
+    if (prevMap[rowMinus][col].surrBees != 0) {
+        value += prevMap[rowMinus][col].flowers * prevMap[rowMinus][col].bees / prevMap[rowMinus][col].surrBees;
+    }
+    if (prevMap[rowMinus][colMinus].surrBees != 0) {
+        value += prevMap[rowMinus][colMinus].flowers * prevMap[rowMinus][colMinus].bees / prevMap[rowMinus][colMinus].surrBees;
+    }
+    if (prevMap[row][colMinus].surrBees != 0) {
+        value += prevMap[row][colMinus].flowers * prevMap[row][colMinus].bees / prevMap[row][colMinus].surrBees;
+    }
+    if (prevMap[rowPlus][colMinus].surrBees != 0) {
+        value += prevMap[rowPlus][colMinus].flowers * prevMap[rowPlus][colMinus].bees / prevMap[rowPlus][colMinus].surrBees;
+    }
+
+    map[row][col].hiveFlowers= value;
+}
+
+void setBeesThatWantFlower(int row, int col) {
+    int rowPlus = row + 1;
+    int rowMinus = row - 1;
+    int colPlus = col + 1;
+    int colMinus = col - 1;
+    int value = 0;
+
+    if (rowPlus == MAX_ROW) {
+        rowPlus = 0;
+    }
+    if (colPlus == MAX_COL) {
+        colPlus = 0;
+    }
+    if (rowMinus == -1) {
+        rowMinus = MAX_ROW - 1;
+    }
+    if (colMinus == -1) {
+        colMinus = MAX_COL - 1;
+    }
+
+    value += prevMap[row][col].bees;
+    value += prevMap[rowPlus][col].bees;
+    value += prevMap[rowPlus][colPlus].bees;
+    value += prevMap[row][colPlus].bees;
+    value += prevMap[rowMinus][colPlus].bees;
+    value += prevMap[rowMinus][col].bees;
+    value += prevMap[rowMinus][colMinus].bees;
+    value += prevMap[row][colMinus].bees;
+    value += prevMap[rowPlus][colMinus].bees;
+
+    map[row][col].surrBees = value;
+}
+
+void hivePopulationChange(int row, int col) {
     int surrValue = getSurroundValue(row, col);
     //chnage value of hive
     if (surrValue < 5) {
-        map[row][col].hive = prevMap[row][col].hive+1;
+        map[row][col].hive = prevMap[row][col].hive + 1;
     }
     else if (surrValue < 10) {
         map[row][col] = prevMap[row][col];
     }
-    else{
-        map[row][col].hive = prevMap[row][col].hive-1;
+    else {
+        map[row][col].hive = prevMap[row][col].hive - 1;
     }
-    
+
     //nicenie
     if (map[row][col].hive == 0) {
         ;
@@ -122,9 +221,6 @@ int applyRules(int row, int col) {
     //oddelovanie
     if (map[row][col].hive == 4) {
         map[row][col].hive = 2;
-        
-
-        
 
         int rowPlus = row + 1;
         int rowMinus = row - 1;
@@ -180,8 +276,6 @@ int applyRules(int row, int col) {
         }
     }
 
-    return 0;
-
 }
 
 void initMap() {
@@ -233,6 +327,8 @@ int getSurroundValue(int row, int col) {
     value += prevMap[rowMinus][colMinus].hive;
     value += prevMap[row][colMinus].hive;
     value += prevMap[rowPlus][colMinus].hive;
+
+
 
     return value;
 }
