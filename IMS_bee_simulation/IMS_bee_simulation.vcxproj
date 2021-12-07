@@ -143,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="queen_eggs.txt" />
+    <Text Include="README.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

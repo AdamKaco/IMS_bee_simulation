@@ -52,7 +52,12 @@ int main()
     for (int i = 0; i < 40; i++) {
         copyPreviousData();
         applyRulesThroughWholeMap();
+        #ifdef _WIN32
         system("CLS");
+        #endif 
+        #ifdef linux
+        system("clear");
+        #endif
         cout << "month: " << i << "\n";
         printData();
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
