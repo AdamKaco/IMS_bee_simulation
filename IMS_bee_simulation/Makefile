@@ -10,4 +10,3 @@ pack:
 	zip 09_xvacla31_xkacoa00 $(NAME).cpp Makefile
 clean:
 	rm -f *.o *.out $(NAME)
-#pack
