@@ -33,14 +33,13 @@ int getInitData();
 int createStartRowPosition();
 int createStartColPosition();
 void test();
-void newHive(int newRow, int newCol);
 int getSurroundValue(int row, int col);
 void initMap();
 int applyRules(int row, int col);
 void copyPreviousData();
 void printData();
 void applyRulesThroughWholeMap();
-void removeFromHives(int position);
+
 
 
 int main()
