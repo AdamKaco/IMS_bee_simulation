@@ -15,20 +15,18 @@ using namespace std;
 #define MAX_COL 10
 #define NUM_OF_MONTHS 12
 
-class Hive {
-public:
-    int row;
-    int col;
+struct Map
+{
+    int hive;
     int bees;
     float honey;
-    Hive(int, int);
+    int flowers;
 };
 
+struct Map map[MAX_ROW][MAX_COL];
 int eggs[NUM_OF_MONTHS];
-int map[MAX_ROW][MAX_COL];
-list<Hive> hives;
 
-int prevMap[MAX_ROW][MAX_COL];
+struct Map prevMap[MAX_ROW][MAX_COL];
 
 
 int getInitData();
@@ -42,14 +40,15 @@ int applyRules(int row, int col);
 void copyPreviousData();
 void printData();
 void applyRulesThroughWholeMap();
+void removeFromHives(int position);
 
 
 int main()
 {
     getInitData();
     initMap();
-
-    for (int i = 0; i < 40; i++) {
+    test();
+    for (int i = 0; i < 5; i++) {
         copyPreviousData();
         applyRulesThroughWholeMap();
         #ifdef _WIN32
@@ -63,6 +62,8 @@ int main()
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
     }
 }
+
+
 
 void applyRulesThroughWholeMap() {
     for (int i = 0; i < MAX_ROW; i++) {
@@ -78,11 +79,11 @@ void printData() {
     cout << "\n";
     for (int i = 0; i < MAX_ROW; i++) {
         for (int j = 0; j < MAX_COL; j++) {
-            if (map[i][j] == 0) {
+            if (map[i][j].hive == 0) {
                 cout << " ";
             }
             else {
-                cout << map[i][j];
+                cout << map[i][j].hive;
             }
             cout << " ";
         }
@@ -99,29 +100,29 @@ void copyPreviousData() {
 }
 
 int applyRules(int row, int col) {
-    if (prevMap[row][col] == 0) {
+    if (prevMap[row][col].hive == 0) {
         return 0;
     }
     int surrValue = getSurroundValue(row, col);
     //chnage value of hive
     if (surrValue < 5) {
-        map[row][col] = prevMap[row][col]+1;
+        map[row][col].hive = prevMap[row][col].hive+1;
     }
     else if (surrValue < 10) {
         map[row][col] = prevMap[row][col];
     }
     else{
-        map[row][col] = prevMap[row][col]-1;
+        map[row][col].hive = prevMap[row][col].hive-1;
     }
     
     //nicenie
-    if (map[row][col] == 0) {
+    if (map[row][col].hive == 0) {
         ;
     }
 
     //oddelovanie
-    if (map[row][col] == 4) {
-        map[row][col] = 2;
+    if (map[row][col].hive == 4) {
+        map[row][col].hive = 2;
         
 
         
@@ -146,36 +147,36 @@ int applyRules(int row, int col) {
         }
 
         //add surrounding values
-        if (prevMap[rowPlus][col] == 0 && done == 0) {
-            map[rowPlus][col] = 2;
+        if (prevMap[rowPlus][col].hive == 0 && done == 0) {
+            map[rowPlus][col].hive = 2;
             done = 1;
         }
-        if (prevMap[rowPlus][colPlus] == 0 && done == 0) {
-            map[rowPlus][colPlus] = 2;
+        if (prevMap[rowPlus][colPlus].hive == 0 && done == 0) {
+            map[rowPlus][colPlus].hive = 2;
             done = 1;
         }
-        if (prevMap[row][colPlus] == 0 && done == 0) {
-            map[row][colPlus] = 2;
+        if (prevMap[row][colPlus].hive == 0 && done == 0) {
+            map[row][colPlus].hive = 2;
             done = 1;
         }
-        if (prevMap[rowMinus][colPlus] == 0 && done == 0) {
-            map[rowMinus][colPlus] = 2;
+        if (prevMap[rowMinus][colPlus].hive == 0 && done == 0) {
+            map[rowMinus][colPlus].hive = 2;
             done = 1;
         }
-        if (prevMap[rowMinus][col] == 0 && done == 0) {
-            map[rowMinus][col] = 2;
+        if (prevMap[rowMinus][col].hive == 0 && done == 0) {
+            map[rowMinus][col].hive = 2;
             done = 1;
         }
-        if (prevMap[rowMinus][colMinus] == 0 && done == 0) {
-            map[rowMinus][colMinus] = 2;
+        if (prevMap[rowMinus][colMinus].hive == 0 && done == 0) {
+            map[rowMinus][colMinus].hive = 2;
             done = 1;
         }
-        if (prevMap[row][colMinus] == 0 && done == 0) {
-            map[row][colMinus] = 2;
+        if (prevMap[row][colMinus].hive == 0 && done == 0) {
+            map[row][colMinus].hive = 2;
             done = 1;
         }
-        if (prevMap[rowPlus][colMinus] == 0 && done == 0) {
-            map[rowPlus][colMinus] = 2;
+        if (prevMap[rowPlus][colMinus].hive == 0 && done == 0) {
+            map[rowPlus][colMinus].hive = 2;
             done = 1;
         }
     }
@@ -187,27 +188,21 @@ int applyRules(int row, int col) {
 void initMap() {
     for (int i = 0; i < MAX_ROW; i++) {
         for (int j = 0; j < MAX_COL; j++) {
-            map[i][j] = 0;
+            map[i][j].hive = 0;
+            map[i][j].flowers = 0;
+            map[i][j].honey = 0.0;
+            map[i][j].bees = 0;
         }
     }
     int x = createStartRowPosition();
     int y = createStartColPosition();
     //TODO instead of 2 some value
-    map[x][y] = 2;
-
-    newHive(x, y);
+    map[x][y].hive = 2;
+    map[x][y].bees = 15000;
 }
 
 void test() {
-    newHive(1, 1);
-    newHive(2, 2);
-    newHive(3, 3);
 
-    auto hive_front = hives.begin();
-
-    std::advance(hive_front, 0);
-
-    std::cout << hive_front->row << '\n';
 }
 
 int getSurroundValue(int row, int col) {
@@ -231,30 +226,18 @@ int getSurroundValue(int row, int col) {
     }
 
     //add surrounding values
-    value += prevMap[rowPlus][col];
-    value += prevMap[rowPlus][colPlus];
-    value += prevMap[row][colPlus];
-    value += prevMap[rowMinus][colPlus];
-    value += prevMap[rowMinus][col];
-    value += prevMap[rowMinus][colMinus];
-    value += prevMap[row][colMinus];
-    value += prevMap[rowPlus][colMinus];
+    value += prevMap[rowPlus][col].hive;
+    value += prevMap[rowPlus][colPlus].hive;
+    value += prevMap[row][colPlus].hive;
+    value += prevMap[rowMinus][colPlus].hive;
+    value += prevMap[rowMinus][col].hive;
+    value += prevMap[rowMinus][colMinus].hive;
+    value += prevMap[row][colMinus].hive;
+    value += prevMap[rowPlus][colMinus].hive;
 
     return value;
 }
 
-Hive::Hive(int rowInit, int colInit) {
-    row = rowInit;
-    col = colInit;
-    bees = 30000;
-    honey = 0.0;
-}
-
-
-void newHive(int newRow, int newCol) {
-    Hive newHive(newRow, newCol);
-    hives.insert(hives.begin(), newHive);
-}
 
 
 int createStartRowPosition() {
