@@ -11,7 +11,7 @@
 
 using namespace std;
 
-#define SPEED_OF_SIMULATION 200
+#define SPEED_OF_SIMULATION 500
 
 #define MAX_ROW 10
 #define MAX_COL 10
@@ -22,13 +22,13 @@ using namespace std;
 #define BEE 2
 #define FLOWER 3
 
-#define MAX_SPWAN_FLOWERS 30 // in hundres of thousunds
+#define MAX_SPWAN_FLOWERS 50 // in hundres of thousunds
 #define PER_OF_FEMALE_BEES 0.85
 #define PER_OF_BEES_COLLECTING 0.3
-#define BEST_FLOWERS_PER_DAY_COLLECTED 1500 
-#define FLOWES_FOR_KG_HONEY 8000000 
-#define BEE_SWARMING_THRESHOLD 40000
-#define WINTER_HONEY_THRESHOLD 3.97
+#define BEST_FLOWERS_PER_DAY_COLLECTED 1000 
+#define FLOWES_FOR_KG_HONEY 12000000 
+#define BEE_SWARMING_THRESHOLD 55000
+#define WINTER_HONEY_THRESHOLD 5
 //#define LOW_FLOWERS
 
 struct Map
@@ -63,6 +63,7 @@ void setBeesThatWantFlower(int row, int col);
 void getAvailableFlowers(int row, int col);
 void hivePopulationChange(int row, int col);
 void printDataFlowers();
+void printDataHoney();
 void destroyHive(int row, int col);
 void applyWinterThroughWholeMap();
 
@@ -93,7 +94,8 @@ int main()
             cout << "year: " << i + 1 << "\n";
             cout << "month: " << j + 1 << "\n";
             printData();
-            printDataFlowers();
+            printDataHoney();
+            //printDataFlowers();
             std::this_thread::sleep_for(std::chrono::milliseconds(SPEED_OF_SIMULATION));
             monthCounter = (monthCounter + 1) % NUM_OF_MONTHS;
         }
@@ -108,8 +110,8 @@ int main()
         applyWinterThroughWholeMap();
         cout << endl << "winter " << "\n";
         printData();
-        printDataFlowers();
-        std::this_thread::sleep_for(std::chrono::milliseconds(SPEED_OF_SIMULATION));
+        printDataHoney();
+        std::this_thread::sleep_for(std::chrono::milliseconds(SPEED_OF_SIMULATION*4));
     }
 }
 
@@ -123,7 +125,12 @@ void applyWinterThroughWholeMap() {
                 if (map[i][j].honey < WINTER_HONEY_THRESHOLD) {
                     destroyHive(i, j);
                 }
-                
+                else {
+                    map[i][j].honey -= WINTER_HONEY_THRESHOLD;
+                    if (map[i][j].honey > WINTER_HONEY_THRESHOLD) {
+                        map[i][j].honey = WINTER_HONEY_THRESHOLD;
+                    }
+                }
             }
         }
     }
@@ -165,6 +172,23 @@ void printDataFlowers() {
             // dont show low flower areas
             if (map[i][j].flowers / (MAX_SPWAN_FLOWERS * 10000) > 2) {
                 cout << map[i][j].flowers / (MAX_SPWAN_FLOWERS * 10000);
+            }
+            else {
+                cout << " ";
+            }
+            cout << " ";
+        }
+        cout << "\n";
+    }
+}
+
+void printDataHoney() {
+    cout << "\n";
+    for (int i = 0; i < MAX_ROW; i++) {
+        for (int j = 0; j < MAX_COL; j++) {
+            // dont show low flower areas
+            if (map[i][j].hive != EMPTY) {
+                cout << (int) map[i][j].honey;
             }
             else {
                 cout << " ";
@@ -339,7 +363,8 @@ void hivePopulationChange(int row, int col) {
     //cout<<"HIVEFLOWERS: "<<prevMap[row][col].hiveFlowers<<endl;
 
     // theoretical most flowers hive can collect
-    int flowersCollected = prevMap[row][col].bees * PER_OF_FEMALE_BEES * PER_OF_BEES_COLLECTING * BEST_FLOWERS_PER_DAY_COLLECTED;
+    //0.8  to average bee population throughout month
+    int flowersCollected = map[row][col].bees * PER_OF_FEMALE_BEES * PER_OF_BEES_COLLECTING * BEST_FLOWERS_PER_DAY_COLLECTED;
 
     // actual number hive can collect
     if (flowersCollected > map[row][col].hiveFlowers) {
