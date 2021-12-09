@@ -11,6 +11,8 @@
 
 using namespace std;
 
+#define SPEED_OF_SIMULATION 200
+
 #define MAX_ROW 10
 #define MAX_COL 10
 #define NUM_OF_MONTHS 5
@@ -20,7 +22,7 @@ using namespace std;
 #define BEE 2
 #define FLOWER 3
 
-#define MAX_SPWAN_FLOWERS 100 // in hundres of thousunds
+#define MAX_SPWAN_FLOWERS 30 // in hundres of thousunds
 #define PER_OF_FEMALE_BEES 0.85
 #define PER_OF_BEES_COLLECTING 0.3
 #define BEST_FLOWERS_PER_DAY_COLLECTED 1500 
@@ -75,13 +77,13 @@ int main()
     //while(1);
     test();
     monthCounter = 0;
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 20; i++) {
         for (int j = 0; j < 5; j++) {
             copyPreviousData();
             applyRulesThroughWholeMap();
 
             #ifdef _WIN32
-                //system("CLS");
+                system("CLS");
             #endif
             
             #ifdef linux
@@ -92,15 +94,22 @@ int main()
             cout << "month: " << j + 1 << "\n";
             printData();
             printDataFlowers();
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            monthCounter++;
+            std::this_thread::sleep_for(std::chrono::milliseconds(SPEED_OF_SIMULATION));
+            monthCounter = (monthCounter + 1) % NUM_OF_MONTHS;
         }
+#ifdef _WIN32
+        system("CLS");
+#endif
+
+#ifdef linux
+        system("clear");
+#endif 
         copyPreviousData();
         applyWinterThroughWholeMap();
-        cout << "winter " << "\n";
+        cout << endl << "winter " << "\n";
         printData();
         printDataFlowers();
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(SPEED_OF_SIMULATION));
     }
 }
 
