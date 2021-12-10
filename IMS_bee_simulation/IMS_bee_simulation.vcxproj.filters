@@ -25,4 +25,9 @@
     </Text>
     <Text Include="README.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="IMS_bee_simulation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

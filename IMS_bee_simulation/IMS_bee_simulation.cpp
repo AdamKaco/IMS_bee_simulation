@@ -1,6 +1,3 @@
-// IMS_bee_simulation.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -8,77 +5,18 @@
 #include <algorithm>
 #include <chrono>
 #include <thread>
+#include "IMS_bee_simulation.h"
 
 using namespace std;
 
-#define SPEED_OF_SIMULATION 500
-
-#define MAX_ROW 10
-#define MAX_COL 10
-#define NUM_OF_MONTHS 5
-
-#define EMPTY 0
-#define HIVE 1
-#define BEE 2
-#define FLOWER 3
-
-#define MAX_SPWAN_FLOWERS 50 // in hundres of thousunds
-#define PER_OF_FEMALE_BEES 0.85
-#define PER_OF_BEES_COLLECTING 0.3
-#define BEST_FLOWERS_PER_DAY_COLLECTED 1000 
-#define FLOWES_FOR_KG_HONEY 12000000 
-#define BEE_SWARMING_THRESHOLD 55000
-#define WINTER_HONEY_THRESHOLD 5
-//#define LOW_FLOWERS
-
-struct Map
-{
-    int hive;
-    int bees;
-    float honey;
-    int flowers;
-    int hiveFlowers;
-    int surrBees;
-    int newHive;
-};
-
-struct Map map[MAX_ROW][MAX_COL];
-int eggs[NUM_OF_MONTHS];
-
-struct Map prevMap[MAX_ROW][MAX_COL];
-int monthCounter;
-
-
-int getInitData();
-int createStartRowPosition();
-int createStartColPosition();
-void test();
-int getSurroundValue(int row, int col);
-void initMap();
-int applyRules(int row, int col);
-void copyPreviousData();
-void printData();
-void applyRulesThroughWholeMap();
-void setBeesThatWantFlower(int row, int col);
-void getAvailableFlowers(int row, int col);
-void hivePopulationChange(int row, int col);
-void printDataFlowers();
-void printDataHoney();
-void destroyHive(int row, int col);
-void applyWinterThroughWholeMap();
-
-
-
 int main()
 {
+    srand(time(NULL));
     getInitData();
     initMap();
-    printData();
 
-    //while(1);
-    test();
     monthCounter = 0;
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < YEARS_OF_SIM; i++) {
         for (int j = 0; j < 5; j++) {
             copyPreviousData();
             applyRulesThroughWholeMap();
@@ -93,8 +31,10 @@ int main()
 
             cout << "year: " << i + 1 << "\n";
             cout << "month: " << j + 1 << "\n";
+            cout << "hive map:" << "\n";
             printData();
-            printDataHoney();
+            //printDataHoney();
+            //printDataFlowersGot();
             //printDataFlowers();
             std::this_thread::sleep_for(std::chrono::milliseconds(SPEED_OF_SIMULATION));
             monthCounter = (monthCounter + 1) % NUM_OF_MONTHS;
@@ -110,9 +50,10 @@ int main()
         applyWinterThroughWholeMap();
         cout << endl << "winter " << "\n";
         printData();
-        printDataHoney();
-        std::this_thread::sleep_for(std::chrono::milliseconds(SPEED_OF_SIMULATION*4));
+        //printDataHoney();
+        std::this_thread::sleep_for(std::chrono::milliseconds(SPEED_OF_SIMULATION*3));
     }
+
 }
 
 void applyWinterThroughWholeMap() {
@@ -121,7 +62,7 @@ void applyWinterThroughWholeMap() {
             map[i][j].newHive = 1;
        
             if (map[i][j].hive != EMPTY) {
-                map[i][j].bees = 15000;
+                map[i][j].bees = randomizer(WINTER_BEES);
                 if (map[i][j].honey < WINTER_HONEY_THRESHOLD) {
                     destroyHive(i, j);
                 }
@@ -136,66 +77,11 @@ void applyWinterThroughWholeMap() {
     }
 }
 
-
-
-
 void applyRulesThroughWholeMap() {
     for (int i = 0; i < MAX_ROW; i++) {
         for (int j = 0; j < MAX_COL; j++) {
             applyRules(i, j);
         }
-    }
-}
-
-
-void printData() {
-    cout << "\n";
-    cout << "\n";
-    for (int i = 0; i < MAX_ROW; i++) {
-        for (int j = 0; j < MAX_COL; j++) {
-            if (map[i][j].hive == EMPTY) {
-                cout << " ";
-            }
-            else {
-                cout << map[i][j].bees / (BEE_SWARMING_THRESHOLD/5);
-            }
-            cout << " ";
-        }
-        cout << "\n";
-    }
-}
-
-void printDataFlowers() {
-    cout << "\n";
-    for (int i = 0; i < MAX_ROW; i++) {
-        for (int j = 0; j < MAX_COL; j++) {
-            // dont show low flower areas
-            if (map[i][j].flowers / (MAX_SPWAN_FLOWERS * 10000) > 2) {
-                cout << map[i][j].flowers / (MAX_SPWAN_FLOWERS * 10000);
-            }
-            else {
-                cout << " ";
-            }
-            cout << " ";
-        }
-        cout << "\n";
-    }
-}
-
-void printDataHoney() {
-    cout << "\n";
-    for (int i = 0; i < MAX_ROW; i++) {
-        for (int j = 0; j < MAX_COL; j++) {
-            // dont show low flower areas
-            if (map[i][j].hive != EMPTY) {
-                cout << (int) map[i][j].honey;
-            }
-            else {
-                cout << " ";
-            }
-            cout << " ";
-        }
-        cout << "\n";
     }
 }
 
@@ -206,6 +92,7 @@ void copyPreviousData() {
         }
     }
 }
+
 void setSurroundings(int* row, int* col, float* value, int* rowPlus, int* rowMinus, int* colPlus, int* colMinus) {
     *value = 0.0;
     *rowPlus = *row + 1;
@@ -225,6 +112,7 @@ void setSurroundings(int* row, int* col, float* value, int* rowPlus, int* rowMin
         *colMinus = MAX_COL - 1;
     }
 }
+
 void calcFlowerValue(int row, int col, float* value) {
     float calc = 0.0;
     if (prevMap[row][col].flowers != 0) {
@@ -234,6 +122,7 @@ void calcFlowerValue(int row, int col, float* value) {
         *value += (calc);
     }
 }
+
 void getAvailableFlowers(int row, int col, int bees) {
 
     float value = 0;
@@ -253,6 +142,7 @@ void getAvailableFlowers(int row, int col, int bees) {
     map[row][col].hiveFlowers = bees * value; //hiveFlowers se pøepoèítá na med
     prevMap[row][col].hiveFlowers = bees * value;
 }
+
 void goodPlace(int row, int col, int* x, int* y, int* flowerCount, int bees) {
     getAvailableFlowers(row, col, bees);
     int flowersAround = map[row][col].hiveFlowers;
@@ -267,6 +157,7 @@ void goodPlace(int row, int col, int* x, int* y, int* flowerCount, int bees) {
         *flowerCount = 0;
     }
 }
+
 void swarming(int row, int col, int count) {
     //cout << "swarming" << endl;
     float value;
@@ -313,10 +204,10 @@ int applyRules(int row, int col) {
             swarming(row, col, count);
             map[row][col].bees = 0;
             map[row][col].hive = 0;
-
         }
         getAvailableFlowers(row, col, prevMap[row][col].bees);
-        hivePopulationChange(row, col);
+        ruleHoneyGain(row, col);
+        rulePopulationGain(row, col);
     }
 
 
@@ -324,12 +215,10 @@ int applyRules(int row, int col) {
 
 }
 
-
 void setBeesThatWantFlower(int row, int col) {
     float value;
     int rowPlus, rowMinus, colPlus, colMinus;
     setSurroundings(&row, &col, &value, &rowPlus, &rowMinus, &colPlus, &colMinus);
-
 
     value += prevMap[row][col].bees;
     value += prevMap[rowPlus][col].bees;
@@ -343,25 +232,7 @@ void setBeesThatWantFlower(int row, int col) {
     prevMap[row][col].surrBees = value;
 }
 
-
-
-void hivePopulationChange(int row, int col) {
-    //int surrValue = getSurroundValue(row, col);
-
-    /*
-    //chnage value of hive
-    if (surrValue < 5) {
-        map[row][col].hive = prevMap[row][col].hive + 1;
-    }
-    else if (surrValue < 10) {
-        map[row][col] = prevMap[row][col];
-    }
-    else {
-        map[row][col].hive = prevMap[row][col].hive - 1;
-    }
-    */
-    //cout<<"HIVEFLOWERS: "<<prevMap[row][col].hiveFlowers<<endl;
-
+void ruleHoneyGain(int row, int col) {
     // theoretical most flowers hive can collect
     //0.8  to average bee population throughout month
     int flowersCollected = map[row][col].bees * PER_OF_FEMALE_BEES * PER_OF_BEES_COLLECTING * BEST_FLOWERS_PER_DAY_COLLECTED;
@@ -371,43 +242,45 @@ void hivePopulationChange(int row, int col) {
         flowersCollected = map[row][col].hiveFlowers;
     }
 
+    flowersCollected = randomizer(flowersCollected);
+
     float flowersMath = (float)flowersCollected;
 
-    //TODO weather factor
+    //maybe add weather factor
     // adding honey based on income
     map[row][col].honey = prevMap[row][col].honey + (flowersMath / FLOWES_FOR_KG_HONEY) * 30;
     // hive of 50 000 bees require 500g of honey a day to survive
     float bees = (float)prevMap[row][col].bees;
-    map[row][col].honey -=  bees / 50000 * 0.5 * 30;
 
+    map[row][col].honey -=  bees / 50000 * 0.5 * 30;
     prevMap[row][col].honey = map[row][col].honey;
-    //cout<<"GROW: "<<growth<<" "<<growth/100<<" "<<prevMap[row][col].hiveFlowers<<" "<<prevMap[row][col].bees<<endl;
-    
+}
+
+void rulePopulationGain(int row, int col) {
+  
     if (monthCounter % NUM_OF_MONTHS > 1) {
-        map[row][col].bees = prevMap[row][col].bees + eggs[monthCounter] * 30 - (eggs[monthCounter - 1] * 30 / 2 + eggs[monthCounter - 2] * 30 / 2) / prevMap[row][col].newHive; // growth can be negative
+        map[row][col].bees = prevMap[row][col].bees + randomizer(eggs[monthCounter]) * 30 - (randomizer(eggs[monthCounter - 1]) * 30 / 2 + randomizer(eggs[monthCounter - 2]) * 30 / 2) / prevMap[row][col].newHive;
     }
     else if (monthCounter % NUM_OF_MONTHS == 1) {
-        map[row][col].bees = prevMap[row][col].bees + eggs[monthCounter] * 30 - (eggs[monthCounter - 1] * 30 / 2) / prevMap[row][col].newHive;
+        map[row][col].bees = prevMap[row][col].bees + randomizer(eggs[monthCounter]) * 30 - (randomizer(eggs[monthCounter - 1]) * 30 / 2) / prevMap[row][col].newHive;
     }
     else {
-        map[row][col].bees = prevMap[row][col].bees + eggs[monthCounter] * 30;
+        map[row][col].bees = prevMap[row][col].bees + randomizer(eggs[monthCounter]) * 30;
     }
     
-
     //nicenie
     if (map[row][col].honey <= 0.0) {
         destroyHive(row,col);
     }
 
     //oddelovanie
-    if (prevMap[row][col].bees > BEE_SWARMING_THRESHOLD) {
+    if (prevMap[row][col].bees > randomizer(BEE_SWARMING_THRESHOLD)) {
         map[row][col].bees /= 2;
         map[row][col].newHive = 2;
         int count = map[row][col].bees;
         //Finding a location to live
         swarming(row, col, count);
     }
-
 }
 
 void destroyHive(int row, int col) {
@@ -424,19 +297,19 @@ int generateFlowerCount() {
     return (rand() % MAX_SPWAN_FLOWERS) * 100000;
 #endif
 
+    //creates more areas of low flower count
 #ifdef LOW_FLOWERS
     if ((rand() % 5) > 1) {
-        return rand() % MAX_SPWAN_FLOWERS/3;
+        return (rand() % MAX_SPWAN_FLOWERS/3) * 100000;
     }
     else {
-        return rand() % MAX_SPWAN_FLOWERS;
+        return (rand() % MAX_SPWAN_FLOWERS) * 100000;
     }
 #endif
 
 
 }
 void spawnFlowers() {
-    srand(time(NULL));
     for (int i = 0; i < MAX_ROW; i++) {
         for (int j = 0; j < MAX_COL; j++) {
             map[i][j].flowers = generateFlowerCount();
@@ -483,14 +356,6 @@ void initMap() {
 
     map[x][y].hive = 2;
     map[x][y].bees = 15000;
-
-
-}
-
-
-
-void test() {
-
 }
 
 
@@ -515,12 +380,10 @@ int getSurroundValue(int row, int col) {
 
 
 int createStartRowPosition() {
-    srand(time(NULL));
     return rand() % MAX_ROW;
 }
 
 int createStartColPosition() {
-    srand(time(NULL));
     return rand() % MAX_COL;
 }
 
@@ -541,4 +404,93 @@ int getInitData() {
     else cout << "Unable to open file";
 
     return 0;
+}
+
+int randomizer(int value) {
+    int per = rand() % 20 + 90;
+    return value * per / 100;
+}
+
+void printEndValues() {
+    long tmp_value = 0;
+    long tmp2 = 0;
+    for (int i = 0; i < MAX_ROW; i++) {
+        for (int j = 0; j < MAX_COL; j++) {
+            tmp_value += map[i][j].flowers;
+            if (map[i][j].hive != EMPTY) {
+                tmp2++;
+            }
+        }
+    }
+    cout << tmp_value << endl;
+    cout << tmp2 << endl << endl;
+}
+
+void printDataHoney() {
+    cout << "\n";
+    for (int i = 0; i < MAX_ROW; i++) {
+        for (int j = 0; j < MAX_COL; j++) {
+            // dont show low flower areas
+            if (map[i][j].hive != EMPTY) {
+                cout << (int)map[i][j].honey;
+            }
+            else {
+                cout << " ";
+            }
+            cout << " ";
+        }
+        cout << "\n";
+    }
+}
+
+void printDataFlowersGot() {
+    cout << "\n";
+    for (int i = 0; i < MAX_ROW; i++) {
+        for (int j = 0; j < MAX_COL; j++) {
+            // dont show low flower areas
+            if (map[i][j].hive != EMPTY) {
+                cout << map[i][j].hiveFlowers;
+            }
+            else {
+                cout << " ";
+            }
+            cout << " ";
+        }
+        cout << "\n";
+    }
+}
+
+void printData() {
+    cout << "\n";
+    cout << "\n";
+    for (int i = 0; i < MAX_ROW; i++) {
+        for (int j = 0; j < MAX_COL; j++) {
+            if (map[i][j].hive == EMPTY) {
+                cout << " ";
+            }
+            else {
+                //cout << map[i][j].bees / (BEE_SWARMING_THRESHOLD/5);
+                cout << "*";
+            }
+            cout << " ";
+        }
+        cout << "\n";
+    }
+}
+
+void printDataFlowers() {
+    cout << "\n";
+    for (int i = 0; i < MAX_ROW; i++) {
+        for (int j = 0; j < MAX_COL; j++) {
+            // dont show low flower areas
+            if (map[i][j].flowers / (MAX_SPWAN_FLOWERS * 10000) > 2) {
+                cout << map[i][j].flowers / (MAX_SPWAN_FLOWERS * 10000);
+            }
+            else {
+                cout << " ";
+            }
+            cout << " ";
+        }
+        cout << "\n";
+    }
 }

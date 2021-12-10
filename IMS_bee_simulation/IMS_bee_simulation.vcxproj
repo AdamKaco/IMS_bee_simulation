@@ -145,6 +145,9 @@
     <Text Include="queen_eggs.txt" />
     <Text Include="README.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="IMS_bee_simulation.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
