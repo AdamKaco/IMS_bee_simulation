@@ -1,7 +1,7 @@
-#define SPEED_OF_SIMULATION 100
+#define SPEED_OF_SIMULATION 30
 
-#define MAX_ROW 31
-#define MAX_COL 30
+#define MAX_ROW 11
+#define MAX_COL 10
 #define NUM_OF_MONTHS 5
 
 #define EMPTY 0
@@ -9,13 +9,13 @@
 #define BEE 2
 #define FLOWER 3
 
-#define MAX_SPWAN_FLOWERS 60 // in hundres of thousunds
-#define YEARS_OF_SIM 20
+#define MAX_SPWAN_FLOWERS 40 // in hundres of thousunds
+#define YEARS_OF_SIM 7
 
 #define PER_OF_FEMALE_BEES 0.85
 #define PER_OF_BEES_COLLECTING 0.3
 #define BEST_FLOWERS_PER_DAY_COLLECTED 1000 
-#define FLOWES_FOR_KG_HONEY 12000000 
+#define FLOWES_FOR_KG_HONEY 4000000 
 #define BEE_SWARMING_THRESHOLD 55000
 #define WINTER_HONEY_THRESHOLD 5
 #define WINTER_BEES 15000

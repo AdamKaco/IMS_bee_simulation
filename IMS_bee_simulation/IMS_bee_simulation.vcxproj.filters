@@ -23,7 +23,7 @@
     <Text Include="queen_eggs.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="README.txt" />
+    <Text Include="README.rm" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IMS_bee_simulation.h">

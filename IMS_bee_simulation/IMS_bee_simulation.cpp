@@ -48,12 +48,12 @@ int main()
 #endif 
         copyPreviousData();
         applyWinterThroughWholeMap();
-        cout << endl << "winter " << "\n";
+        cout << endl << "winter survivors:" << "\n" <<"\n";
         printData();
         //printDataHoney();
         std::this_thread::sleep_for(std::chrono::milliseconds(SPEED_OF_SIMULATION*3));
     }
-
+    //printEndValues();
 }
 
 void applyWinterThroughWholeMap() {

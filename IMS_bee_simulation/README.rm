@@ -1,0 +1,20 @@
+Prelozenie programu "make".
+Spustenie programu "make run".
+vycistenie adresara "make clean".
+
+Pre zmenu spravania simulacie treba upravit konstanty v subore IMS_bee_simulation.h alebo subor queen_eggs.txt.
+
+SPEED_OF_SIMULATION - rychlost akou bude simulacia animovana v ms
+
+MAX_ROW - pocet riadkov
+MAX_COL - pocet stlpcov
+NUM_OF_MONTHS - pocet udajov v subore queen_eggs.txt a kolko mesiacov sa bude simulovat
+
+MAX_SPWAN_FLOWERS - maximalna hodnota (v 100 000-coch) poctu kvetov na blok, priemerna je 1/2 zo zadanej
+YEARS_OF_SIM - kolko rokov chceme simulovat
+
+BEST_FLOWERS_PER_DAY_COLLECTED - kolko kvetov denne vedia vcely nazbierat
+FLOWES_FOR_KG_HONEY - pocet kvetov na kg medu
+BEE_SWARMING_THRESHOLD - pri akej hodnote sa ul zacne rozdelovat
+WINTER_HONEY_THRESHOLD - kolko medu potrebuje vcely aby prezili zimu
+WINTER_BEES - kolko vciel prezije zimu
