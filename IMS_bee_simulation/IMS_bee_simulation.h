@@ -1,3 +1,9 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <chrono>
+#include <thread>
+
 #define SPEED_OF_SIMULATION 30
 
 #define MAX_ROW 11
@@ -19,7 +25,7 @@
 #define BEE_SWARMING_THRESHOLD 55000
 #define WINTER_HONEY_THRESHOLD 5
 #define WINTER_BEES 15000
-//#define LOW_FLOWERS
+//#define LOW_FLOWERS //higher rate of low flower blocks
 
 struct Map
 {

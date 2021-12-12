@@ -1,10 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <list>
-#include <algorithm>
-#include <chrono>
-#include <thread>
+// vyporacovali: xkacoa00, xvacla31
 #include "IMS_bee_simulation.h"
 
 using namespace std;
